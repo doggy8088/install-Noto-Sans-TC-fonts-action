@@ -1,0 +1,33 @@
+name: 'Install Noto Sans TC fonts'
+description: 'Install Noto Sans Traditional Chinese fonts'
+author: doggy8088
+branding:
+  icon: type
+  color: orange
+inputs:
+  extra:
+    description: 'Install fonts-noto-cjk-extra for additional weights (Thin, Light, Medium, etc.)'
+    required: false
+    default: 'false'
+runs:
+  using: "composite"
+  steps:
+    - shell: bash
+      run: |
+        echo "::group::Update package list"
+        sudo apt-get update
+        echo "::endgroup::"
+
+        echo "::group::Install fonts-noto-cjk"
+        sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends fonts-noto-cjk
+        echo "::endgroup::"
+
+        if [ "${{ inputs.extra }}" = "true" ]; then
+          echo "::group::Install fonts-noto-cjk-extra"
+          sudo env DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends fonts-noto-cjk-extra
+          echo "::endgroup::"
+        fi
+
+        echo "::group::Update font cache"
+        sudo fc-cache -fv
+        echo "::endgroup::"

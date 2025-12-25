@@ -1,0 +1,51 @@
+# GitHub Copilot Coding Agent Setup Steps
+# This workflow demonstrates how to install Noto Sans TC fonts for GitHub Copilot coding agent
+
+name: Copilot Setup Steps CI
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  install-fonts:
+    name: Install fonts (${{ matrix.os }}, extra=${{ matrix.extra }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ubuntu-latest
+          - ubuntu-24.04
+          - ubuntu-22.04
+          - ubuntu-20.04
+        extra:
+          - 'false'
+          - 'true'
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install Noto Sans TC fonts
+        uses: ./
+        with:
+          extra: ${{ matrix.extra }}
+
+      - name: Verify fonts installed
+        run: |
+          echo "Checking installed Noto Sans CJK TC fonts (extra=${{ matrix.extra }}):"
+          fc-list | grep "Noto Sans CJK TC"
+
+      - name: Show font count
+        run: |
+          echo "Total Noto Sans CJK TC font variants installed (extra=${{ matrix.extra }}):"
+          fc-list | grep "Noto Sans CJK TC" | wc -l
+
+      - name: List all font weights
+        if: ${{ matrix.extra == 'true' }}
+        run: |
+          echo "Available font weights:"
+          fc-list | grep "Noto Sans CJK TC" | sed 's/.*style=/- /' | sort -u
